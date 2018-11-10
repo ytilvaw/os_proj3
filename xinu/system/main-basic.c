@@ -3,16 +3,15 @@
 
 #include <xinu.h>
 
-uint32 n = 25;
-uint32 array[n];
-uint32 num_threads = 10;
 
 uint32 serial_summation(uint32 *array, uint32 n)
 {
     int i = 0;
     uint32 sum = 0;
     for(i=0; i<n; i++)
+	{
         sum = sum + *(array+i);
+	}
 
     return sum;
 }
