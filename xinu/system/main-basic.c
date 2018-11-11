@@ -54,10 +54,19 @@ uint32 sync_parallel_summation  (uint32 *array, uint32 n, uint32 num_threads)
 {
     sum = 0;
     count = 0;
-    lock_t l;
-    sl_init(&l);
 
-    void indiVidual_sum_sync(uint32*, int, lock_t*);
+    //for spin lock
+    //lock_t l;
+    //sl_init(&l);
+    
+    //for lock queue
+    lock_tq l;
+    slq_init(&l);
+    //kprintf("queue initialization success\n");
+
+    //void indiVidual_sum_sync(uint32*, int, lock_t*);     // for spin lock
+    void indiVidual_sum_sync(uint32*, int, lock_tq*);      // for lock queue 
+    
     for(int i=0; i<num_threads;i++)
     {
     	resume(create((void *)indiVidual_sum_sync, 4096,20, "parallel_summation", 3, array, (i*5), &l ) );
@@ -70,19 +79,22 @@ uint32 sync_parallel_summation  (uint32 *array, uint32 n, uint32 num_threads)
 }
 
 
-void indiVidual_sum_sync(uint32 *array, int start, lock_t* l)
+//void indiVidual_sum_sync(uint32 *array, int start, lock_t* l) // for spin lock
+void indiVidual_sum_sync(uint32 *array, int start, lock_tq* l)  // for lock queue
 {
     int temp;
     //kprintf("process with start = %d acquired lock\n",start);
     for(int i=start; i<(start+5); i++)
     {
-        sl_lock(l);
+        //sl_lock(l);             // for spin lock
+        slq_lock(l);              // for lock queue 
         temp = sum;
         temp = temp + *(array+i);
         sleepms(100);
         sum = temp;
         count = count + 1;
-        sl_unlock(l);
+        //sl_unlock(l);          // for spin lock
+        slq_unlock(l);           // for lock queue 
     }
     //kprintf("process with start = %d released lock\n",start);
     //kprintf("sum = %d\n",sum);

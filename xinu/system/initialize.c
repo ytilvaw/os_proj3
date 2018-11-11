@@ -180,6 +180,7 @@ static	void	sysinit()
 		prptr->prname[0] = NULLCH;
 		prptr->prstkbase = NULL;
 		prptr->prprio = 0;
+        prptr->park = FALSE;
 	}
 
 	/* Initialize the Null process entry */	

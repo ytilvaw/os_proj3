@@ -29,7 +29,7 @@ process	main(void)
 	//initializing array
 	for(int i=0;i<n;i++)
 	{
-		array[i] = i;
+		array[i] = i*2;
 	}
 	sum_ser_arr = serial_summation(array, n);	
 	kprintf("Sum of array serial -> %d\n", sum_ser_arr);	
