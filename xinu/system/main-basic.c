@@ -83,6 +83,7 @@ uint32 sync_parallel_summation  (uint32 *array, uint32 n, uint32 num_threads)
 void indiVidual_sum_sync(uint32 *array, int start, lock_tq* l)  // for lock queue
 {
     int temp;
+    struct procent* prptr;
     //kprintf("process with start = %d acquired lock\n",start);
     for(int i=start; i<(start+5); i++)
     {
@@ -93,6 +94,9 @@ void indiVidual_sum_sync(uint32 *array, int start, lock_tq* l)  // for lock queu
         sleepms(100);
         sum = temp;
         count = count + 1;
+        printf("currpid = %d\n", currpid);
+        prptr = &proctab[currpid];
+        printf("state = %d\n", prptr->prstate);
         //sl_unlock(l);          // for spin lock
         slq_unlock(l);           // for lock queue 
     }

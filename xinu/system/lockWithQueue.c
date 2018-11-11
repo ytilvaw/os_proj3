@@ -17,7 +17,8 @@ void queue_add(queue_t* q, pid32 pid)
 {
     pid32 ans;
     enqueue(pid, *q);
-    //printf("Added the process = %d to the queue\n", pid);
+    //printf("*q = %d\n", *q);
+    printf("Added the process = %d to the queue\n", pid);
 }
 
 bool8 queue_empty(queue_t* q)
@@ -28,7 +29,10 @@ bool8 queue_empty(queue_t* q)
 pid32 queue_remove(queue_t* q)
 {
     //printf("removing the process = %d from the queue\n", *q);
-    return dequeue(*q);
+    pid32 temp = dequeue(*q);
+    printf("removing the process = %d from the queue\n", temp);
+    //return dequeue(*q);
+    return temp;
 }
 
 void setpark(pid32 pid)
@@ -59,6 +63,7 @@ void slq_init(lock_tq *l)
     qid16 q;
     q = newqueue();
 
+    printf("qid = %d\n",q);
     l->flag = 0;
     l->guard = 0;
     *(l->q) = q;
@@ -73,10 +78,12 @@ void slq_lock(lock_tq *l)
     {
         l->flag = 1;
         l->guard = 0;
+        printf("process %d acquired the lock \n", currpid);
     }
     else
     {
         queue_add (l->q, currpid);
+        printf("last_id is ");
         setpark(currpid);
         l->guard = 0;
         park(currpid);
@@ -85,15 +92,19 @@ void slq_lock(lock_tq *l)
 
 void slq_unlock(lock_tq *l)
 {
+    pid32 temp;
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
     
     if( queue_empty(l->q) )
     {
         l->flag = 0;
+        printf("process %d relased the lock \n", currpid);
     }
     else
     {
-        unpark ( queue_remove(l->q) );
+        temp = queue_remove(l->q);
+        printf("Process %d got the lock from %d \n", temp, currpid);
+        unpark ( temp );
     }
     
     l->guard = 0;
