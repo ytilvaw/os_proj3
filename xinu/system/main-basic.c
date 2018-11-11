@@ -94,9 +94,9 @@ void indiVidual_sum_sync(uint32 *array, int start, lock_tq* l)  // for lock queu
         sleepms(100);
         sum = temp;
         count = count + 1;
-        printf("currpid = %d\n", currpid);
+        //printf("currpid = %d\n", currpid);
         prptr = &proctab[currpid];
-        printf("state = %d\n", prptr->prstate);
+        //printf("state = %d\n", prptr->prstate);
         //sl_unlock(l);          // for spin lock
         slq_unlock(l);           // for lock queue 
     }

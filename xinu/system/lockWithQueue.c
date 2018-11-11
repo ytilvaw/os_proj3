@@ -18,7 +18,7 @@ void queue_add(queue_t* q, pid32 pid)
     pid32 ans;
     enqueue(pid, *q);
     //printf("*q = %d\n", *q);
-    printf("Added the process = %d to the queue\n", pid);
+    //printf("Added the process = %d to the queue\n", pid);
 }
 
 bool8 queue_empty(queue_t* q)
@@ -30,7 +30,7 @@ pid32 queue_remove(queue_t* q)
 {
     //printf("removing the process = %d from the queue\n", *q);
     pid32 temp = dequeue(*q);
-    printf("removing the process = %d from the queue\n", temp);
+    //printf("removing the process = %d from the queue\n", temp);
     //return dequeue(*q);
     return temp;
 }
@@ -46,7 +46,7 @@ void park(pid32 pid)
 {
     struct procent* prptr;
     prptr = &proctab[pid];
-    if( prptr->park == TRUE ) suspend(pid);
+    if( prptr->park == TRUE ); //suspend(pid);
 }
 
 void unpark( pid32 pid )
@@ -63,7 +63,7 @@ void slq_init(lock_tq *l)
     qid16 q;
     q = newqueue();
 
-    printf("qid = %d\n",q);
+    //printf("qid = %d\n",q);
     l->flag = 0;
     l->guard = 0;
     *(l->q) = q;
@@ -72,21 +72,34 @@ void slq_init(lock_tq *l)
 
 void slq_lock(lock_tq *l)
 {
+
+    struct procent* prptr;
+    intmask mask;
+
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
 
     if(l->flag == 0)
     {
         l->flag = 1;
         l->guard = 0;
-        printf("process %d acquired the lock \n", currpid);
+        //printf("process %d acquired the lock \n", currpid);
     }
     else
     {
-        queue_add (l->q, currpid);
-        printf("last_id is ");
-        setpark(currpid);
+        //queue_add (l->q, currpid);
+        enqueue(currpid, *(l->q));
+        prptr = &proctab[currpid];
+        prptr->park = TRUE;
         l->guard = 0;
-        park(currpid);
+        //park(currpid);
+        if( prptr->park == TRUE ) //suspend(pid);
+        {
+            prptr->prstate = PR_WAIT;
+            mask = disable();
+	        resched();
+	        restore(mask);
+        }
+
     }
 }
 
@@ -98,13 +111,18 @@ void slq_unlock(lock_tq *l)
     if( queue_empty(l->q) )
     {
         l->flag = 0;
-        printf("process %d relased the lock \n", currpid);
+        //printf("process %d relased the lock \n", currpid);
     }
     else
     {
-        temp = queue_remove(l->q);
-        printf("Process %d got the lock from %d \n", temp, currpid);
-        unpark ( temp );
+        //temp = queue_remove(l->q);
+        temp = dequeue(*(l->q));
+        //printf("Process %d got the lock from %d \n", temp, currpid);
+        //unpark ( temp );
+        struct procent* prptr;
+        prptr = &proctab[temp];
+        prptr->park = FALSE;
+        ready(temp);
     }
     
     l->guard = 0;
