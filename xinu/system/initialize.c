@@ -220,6 +220,9 @@ static	void	sysinit()
 
 	clkinit();
 
+	/* Initialize lock array for deadlock detection */
+	l_arr_init();
+
 	for (i = 0; i < NDEVS; i++) {
 		init(i);
 	}

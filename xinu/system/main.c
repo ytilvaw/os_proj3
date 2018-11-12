@@ -43,22 +43,9 @@ process	main(void)
     //sync with lock parallel array
     sum_naive_arr = sync_parallel_summation(array, n, num_threads);
 	kprintf("Sum of array sync parallel with lock -> %d\n", sum_naive_arr);
-	//creating 10 processes to run naive_parallel_summation func
-	//for(int i=0; i<10;i++)
-	//{
-	//	resume(create((void *)naive_parallel_summation, 4096,20, "parallel_summation", 3, array, n, num_threads));
-	//	kprintf("%d th process has been created\n", i);
-	//}	
-	//sum_par_arr = serial_summation(array, n, 10);
-	
-	//recvclr();
-	//resume(create(shell, 8192, 50, "shell", 1, CONSOLE));
-	//while (TRUE) {
-	//	receive();
-	//	sleepms(200);
-	//	kprintf("\n\nMain process recreating shell\n\n");
-	//	resume(create(shell, 4096, 20, "shell", 1, CONSOLE));
-	//}
+
+	//create_proc_for_deadlock_4p_1d();
+	create_proc_for_deadlock_5p_2d();
 	return OK;
     
 }

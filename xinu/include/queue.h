@@ -6,10 +6,10 @@
 /*			2 for sleep list plus 2 per semaphore		*/
 
 
-//num_locks = 100;            // total number of locks supported by system
+#define T_LOCKS 5            // total number of locks supported by system
 
 #ifndef NQENT
-#define NQENT	(NPROC + 4 + NSEM + NSEM + (100*2) )
+#define NQENT	(NPROC + 4 + NSEM + NSEM + T_LOCKS + T_LOCKS)
 #endif
 
 #define	EMPTY	(-1)		/* Null value for qnext or qprev index	*/

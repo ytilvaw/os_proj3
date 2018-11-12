@@ -1,9 +1,18 @@
 
+
+/*-------------------for p2----------------------------------*/
 typedef struct __lock_t { 
     int flag; 
 } lock_t;
 
-//for part3
+void sl_init(lock_t *l);
+void sl_lock(lock_t *l);
+void sl_unlock(lock_t *l);
+/*-------------------for p2----------------------------------*/
+
+
+
+/*-------------------for p3----------------------------------*/
 typedef qid16 queue_t;
 
 typedef struct __lock_tq {
@@ -12,19 +21,41 @@ typedef struct __lock_tq {
     queue_t* q;
 } lock_tq;
 
-void sl_init(lock_t *l);
-void sl_lock(lock_t *l);
-void sl_unlock(lock_t *l);
 
-
-void queue_init(queue_t** q);
-void queue_add(queue_t* q, pid32 pid);
-bool8 queue_empty(queue_t* q);
-pid32 queue_remove(queue_t* q);
-void setpark(pid32 pid);
-void park(pid32 pid);
-void unpark( pid32 pid );
 void slq_init(lock_tq *l);
 void slq_lock(lock_tq *l);
 void slq_unlock(lock_tq *l);
+/*-------------------for p3----------------------------------*/
+
+/*-------------------for p4----------------------------------*/
+
+uint32 lock_id;
+
+typedef struct __lock_td {
+    int 		flag;
+    int 		guard;
+    queue_t* 	q;
+	uint32		lid;
+} lock_td;
+
+
+
+struct l_arr_entry
+{
+	bool8 	avail;
+	pid32 	owner_proc;
+	pid32	wait_proc;
+};
+
+struct l_arr_entry l_arr[T_LOCKS];
+bool8 d_arr[NPROC];
+
+void	print_l_arr();
+void 	search_owner_in_wait_col(bool8 *found, uint32 *temp_lid, pid32 owner);
+void 	al_init(lock_td *l);
+void 	al_lock(lock_td *l);
+void 	al_unlock(lock_td *l);
+bool8 	al_trylock(lock_td *l);
+/*-------------------for p4----------------------------------*/
+
 
