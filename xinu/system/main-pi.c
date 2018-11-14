@@ -5,7 +5,7 @@
 
 
 /*-----------------------------------------------------------------------------*/
-void printA_pi(lock_tpi *l0)
+void printA_pi(pi_lock_t *l0)
 {
 	intmask mask;
 	pi_lock(l0);
@@ -17,7 +17,7 @@ void printA_pi(lock_tpi *l0)
 	pi_unlock(l0);
 }
 
-void printB_pi(lock_tpi *l0)
+void printB_pi(pi_lock_t *l0)
 {
 	sleepms(500);
 	intmask mask;
@@ -31,7 +31,7 @@ void printB_pi(lock_tpi *l0)
 
 void create_proc_for_pi_2p()
 {
-	lock_td l0;
+	pi_lock_t l0;
 
 	pi_init(&l0);
 
@@ -41,7 +41,7 @@ void create_proc_for_pi_2p()
 
 /*-----------------------------------------------------------------------------*/
 
-void print_p1_pi(lock_tpi *l0, lock_tpi *l1)
+void print_p1_pi(pi_lock_t *l0, pi_lock_t *l1)
 {
 	intmask mask;
 	pi_lock(l0);
@@ -53,7 +53,7 @@ void print_p1_pi(lock_tpi *l0, lock_tpi *l1)
 	pi_unlock(l0);
 }
 
-void print_p2_pi(lock_tpi *l0)
+void print_p2_pi(pi_lock_t *l0)
 {
 	sleepms(300);
 	intmask mask;
@@ -63,7 +63,7 @@ void print_p2_pi(lock_tpi *l0)
 }
 
 
-void print_p3_pi(lock_tpi *l1)
+void print_p3_pi(pi_lock_t *l1)
 {
 	sleepms(500);
 	intmask mask;
@@ -75,8 +75,8 @@ void print_p3_pi(lock_tpi *l1)
 
 void create_proc_for_pi_3p()
 {
-	lock_tpi l1;
-	lock_tpi l2;
+	pi_lock_t l1;
+	pi_lock_t l2;
 
 	pi_init(&l1);
 	pi_init(&l2);
@@ -89,7 +89,7 @@ void create_proc_for_pi_3p()
 
 /*-----------------------------------------------------------------------------*/
 
-void print_p1_pi_4p(lock_tpi *l0, lock_tpi *l1, lock_tpi *l2)
+void print_p1_pi_4p(pi_lock_t *l0, pi_lock_t *l1, pi_lock_t *l2)
 {
 	intmask mask;
 	pi_lock(l0);
@@ -98,12 +98,12 @@ void print_p1_pi_4p(lock_tpi *l0, lock_tpi *l1, lock_tpi *l2)
 
 	sleepms(1000);
 
-	pi_unlock(l2);
-	pi_unlock(l1);
 	pi_unlock(l0);
+	pi_unlock(l1);
+	pi_unlock(l2);
 }
 
-void print_p2_pi_4p(lock_tpi *l0)
+void print_p2_pi_4p(pi_lock_t *l0)
 {
 	sleepms(300);
 	intmask mask;
@@ -113,7 +113,7 @@ void print_p2_pi_4p(lock_tpi *l0)
 }
 
 
-void print_p3_pi_4p(lock_tpi *l1)
+void print_p3_pi_4p(pi_lock_t *l1)
 {
 	sleepms(500);
 	intmask mask;
@@ -123,7 +123,7 @@ void print_p3_pi_4p(lock_tpi *l1)
 	pi_unlock(l1);
 }
 
-void print_p4_pi_4p(lock_tpi *l2)
+void print_p4_pi_4p(pi_lock_t *l2)
 {
 	sleepms(700);
 	intmask mask;
@@ -136,9 +136,9 @@ void print_p4_pi_4p(lock_tpi *l2)
 
 void create_proc_for_pi_4p_3p()
 {
-	lock_tpi l1;
-	lock_tpi l2;
-	lock_tpi l3;
+	pi_lock_t l1;
+	pi_lock_t l2;
+	pi_lock_t l3;
 
 	pi_init(&l1);
 	pi_init(&l2);

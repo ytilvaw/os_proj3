@@ -4,7 +4,7 @@
 #include <xinu.h>
 
 
-void printA(lock_td *l0, lock_td *l1)
+void printA(al_lock_t *l0, al_lock_t *l1)
 {
 	intmask mask;
 	al_lock(l0);
@@ -23,7 +23,7 @@ void printA(lock_td *l0, lock_td *l1)
 	al_unlock(l1);
 }
 
-void printB(lock_td *l1, lock_td *l2)
+void printB(al_lock_t *l1, al_lock_t *l2)
 {
 
 	intmask mask;
@@ -43,7 +43,7 @@ void printB(lock_td *l1, lock_td *l2)
 	al_unlock(l2);
 }
 
-void printC(lock_td *l2, lock_td *l3)
+void printC(al_lock_t *l2, al_lock_t *l3)
 {
 	intmask mask;
 	al_lock(l2);
@@ -62,7 +62,7 @@ void printC(lock_td *l2, lock_td *l3)
 	al_unlock(l3);
 }
 
-void printD(lock_td *l3, lock_td *l0)
+void printD(al_lock_t *l3, al_lock_t *l0)
 {
 
 	intmask mask;
@@ -85,10 +85,10 @@ void printD(lock_td *l3, lock_td *l0)
 
 void create_proc_for_deadlock_4p_1d()
 {
-	lock_td l0;
-	lock_td l1;
-	lock_td l2;
-	lock_td l3;
+	al_lock_t l0;
+	al_lock_t l1;
+	al_lock_t l2;
+	al_lock_t l3;
 
 	
 	al_init(&l0);
@@ -115,7 +115,7 @@ void create_proc_for_deadlock_4p_1d()
 
 
  
-void printA_d2(lock_td *l0, lock_td *l1)
+void printA_d2(al_lock_t *l0, al_lock_t *l1)
 {
 	intmask mask;
 	al_lock(l0);
@@ -134,7 +134,7 @@ void printA_d2(lock_td *l0, lock_td *l1)
 	al_unlock(l1);
 }
 
-void printB_d2(lock_td *l1, lock_td *l2)
+void printB_d2(al_lock_t *l1, al_lock_t *l2)
 {
 
 	intmask mask;
@@ -154,7 +154,7 @@ void printB_d2(lock_td *l1, lock_td *l2)
 	al_unlock(l2);
 }
 
-void printC_d2(lock_td *l2, lock_td *l0)
+void printC_d2(al_lock_t *l2, al_lock_t *l0)
 {
 	intmask mask;
 	al_lock(l2);
@@ -173,7 +173,7 @@ void printC_d2(lock_td *l2, lock_td *l0)
 	al_unlock(l0);
 }
 
-void printD_d2(lock_td *l3, lock_td *l4)
+void printD_d2(al_lock_t *l3, al_lock_t *l4)
 {
 
 	intmask mask;
@@ -193,7 +193,7 @@ void printD_d2(lock_td *l3, lock_td *l4)
 	al_unlock(l4);
 }
 
-void printE_d2(lock_td *l4, lock_td *l3)
+void printE_d2(al_lock_t *l4, al_lock_t *l3)
 {
 
 	intmask mask;
@@ -215,11 +215,11 @@ void printE_d2(lock_td *l4, lock_td *l3)
 
 void create_proc_for_deadlock_5p_2d()
 {
-	lock_td l0;
-	lock_td l1;
-	lock_td l2;
-	lock_td l3;
-	lock_td l4;
+	al_lock_t l0;
+	al_lock_t l1;
+	al_lock_t l2;
+	al_lock_t l3;
+	al_lock_t l4;
 
 	
 	al_init(&l0);

@@ -53,7 +53,7 @@ void search_owner_in_wait_col(bool8 *found, uint32 *temp_lid, pid32 owner)
 }
 
 
-void al_init(lock_td *l)
+void al_init(al_lock_t *l)
 {
     *(l->q) = newqueue();
 
@@ -71,7 +71,7 @@ void al_init(lock_td *l)
 	lock_id++;
 }
 
-bool8 al_trylock(lock_td *l)
+bool8 al_trylock(al_lock_t *l)
 {
 	if(l->flag == 1)
 	{
@@ -79,11 +79,13 @@ bool8 al_trylock(lock_td *l)
 	}
 	else
 	{
+        l->flag = 1;
+        l->guard = 0;
 		return TRUE;
 	}
 }
 
-void al_lock(lock_td *l)
+void al_lock(al_lock_t *l)
 {
 
     struct procent* prptr;
@@ -190,7 +192,7 @@ void al_lock(lock_td *l)
     }
 }
 
-void al_unlock(lock_td *l)
+void al_unlock(al_lock_t *l)
 {
     intmask mask;
     mask = disable();

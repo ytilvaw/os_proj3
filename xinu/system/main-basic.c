@@ -60,45 +60,87 @@ uint32 sync_parallel_summation  (uint32 *array, uint32 n, uint32 num_threads)
     //sl_init(&l);
     
     //for lock queue
-    lock_tq l;
-    slq_init(&l);
+    lock_t l;
+    init_lock(&l);
     //kprintf("queue initialization success\n");
 
     //void indiVidual_sum_sync(uint32*, int, lock_t*);     // for spin lock
-    void indiVidual_sum_sync(uint32*, int, lock_tq*);      // for lock queue 
+    void indiVidual_sum_sync(uint32*, int, lock_t*, bool8);      // for lock queue 
     
     for(int i=0; i<num_threads;i++)
     {
-    	resume(create((void *)indiVidual_sum_sync, 4096,20, "parallel_summation", 3, array, (i*5), &l ) );
+    	resume(create((void *)indiVidual_sum_sync, 4096,20, "parallel_summation", 4, array, (i*5), &l , FALSE) );
     	//sleepms(200);
         //kprintf("%d th process has been created, and sum = %d\n", i, sum);
     }	
     while(count < n);
+	stop_2 = ctr1000;
+    return sum;
+
+}
+
+
+/* performs the summation in parallel using locks */
+uint32 sync_parallel_summation_p2  (uint32 *array, uint32 n, uint32 num_threads)
+{
+    sum = 0;
+    count = 0;
+
+    //for spin lock
+    //lock_t l;
+    //sl_init(&l);
+    
+    //for lock queue
+    lock_t l;
+    init_lock(&l);
+    //kprintf("queue initialization success\n");
+
+    //void indiVidual_sum_sync(uint32*, int, lock_t*);     // for spin lock
+    void indiVidual_sum_sync(uint32*, int, lock_t*, bool8);      // for lock queue 
+    
+    for(int i=0; i<num_threads;i++)
+    {
+    	resume(create((void *)indiVidual_sum_sync, 4096,20, "parallel_summation", 3, array, (i*5), &l , TRUE) );
+    	//sleepms(200);
+        //kprintf("%d th process has been created, and sum = %d\n", i, sum);
+    }	
+    while(count < n);
+	stop_1 = ctr1000;
     return sum;
 
 }
 
 
 //void indiVidual_sum_sync(uint32 *array, int start, lock_t* l) // for spin lock
-void indiVidual_sum_sync(uint32 *array, int start, lock_tq* l)  // for lock queue
+void indiVidual_sum_sync(uint32 *array, int start, lock_t* l, bool8 spin_lock)  // for lock queue
 {
     int temp;
     struct procent* prptr;
     //kprintf("process with start = %d acquired lock\n",start);
     for(int i=start; i<(start+5); i++)
     {
-        //sl_lock(l);             // for spin lock
-        slq_lock(l);              // for lock queue 
+		if(spin_lock)
+		{
+        	sl_lock(l);              // for spin lock 
+		}
+		else
+		{
+        	lock(l);              // for lock queue 
+		}
         temp = sum;
         temp = temp + *(array+i);
         sleepms(100);
         sum = temp;
         count = count + 1;
-        //printf("currpid = %d\n", currpid);
         prptr = &proctab[currpid];
-        //printf("state = %d\n", prptr->prstate);
-        //sl_unlock(l);          // for spin lock
-        slq_unlock(l);           // for lock queue 
+		if(spin_lock)
+		{
+        	sl_unlock(l);              // for spin lock
+		}
+		else
+		{
+        	unlock(l);              // for lock queue 
+		}
     }
     //kprintf("process with start = %d released lock\n",start);
     //kprintf("sum = %d\n",sum);

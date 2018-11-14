@@ -1,13 +1,15 @@
 
 
 /*-------------------for p2----------------------------------*/
-typedef struct __lock_t { 
+uint32 start_1;
+uint32 stop_1;
+typedef struct __sl_lock_t { 
     int flag; 
-} lock_t;
+} sl_lock_t;
 
-void sl_init(lock_t *l);
-void sl_lock(lock_t *l);
-void sl_unlock(lock_t *l);
+void sl_init(sl_lock_t *l);
+void sl_lock(sl_lock_t *l);
+void sl_unlock(sl_lock_t *l);
 /*-------------------for p2----------------------------------*/
 
 
@@ -15,28 +17,31 @@ void sl_unlock(lock_t *l);
 /*-------------------for p3----------------------------------*/
 typedef qid16 queue_t;
 
-typedef struct __lock_tq {
+uint32 start_2;
+uint32 stop_2;
+
+typedef struct __lock_t {
     int flag;
     int guard;
     queue_t* q;
-} lock_tq;
+} lock_t;
 
 
-void slq_init(lock_tq *l);
-void slq_lock(lock_tq *l);
-void slq_unlock(lock_tq *l);
+void init_lock(lock_t *l);
+void lock(lock_t *l);
+void unlock(lock_t *l);
 /*-------------------for p3----------------------------------*/
 
 /*-------------------for p4----------------------------------*/
 
 uint32 lock_id;
 
-typedef struct __lock_td {
+typedef struct __al_lock_t {
     int 		flag;
     int 		guard;
     queue_t* 	q;
 	uint32		lid;
-} lock_td;
+} al_lock_t;
 
 
 
@@ -53,26 +58,26 @@ bool8 d_arr[NPROC];
 
 void	print_l_arr();
 void 	search_owner_in_wait_col(bool8 *found, uint32 *temp_lid, pid32 owner);
-void 	al_init(lock_td *l);
-void 	al_lock(lock_td *l);
-void 	al_unlock(lock_td *l);
-bool8 	al_trylock(lock_td *l);
+void 	al_init(al_lock_t *l);
+void 	al_lock(al_lock_t *l);
+void 	al_unlock(al_lock_t *l);
+bool8 	al_trylock(al_lock_t *l);
 /*-------------------for p4----------------------------------*/
 
 
 
 /*-------------------for p5----------------------------------*/
 
-typedef struct __lock_tpi {
+typedef struct __pi_lock_t {
     int 		flag;
     int 		guard;
     queue_t* 	q;
 	uint32		lid;
-} lock_tpi;
+} pi_lock_t;
 
 pri16 	find_n_max(pid32 owner);
-void 	pi_init(lock_tpi *l);
-void 	pi_lock(lock_tpi *l);
-void 	pi_unlock(lock_tpi *l);
+void 	pi_init(pi_lock_t *l);
+void 	pi_lock(pi_lock_t *l);
+void 	pi_unlock(pi_lock_t *l);
 /*-------------------for p5----------------------------------*/
 

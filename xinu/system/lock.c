@@ -1,8 +1,8 @@
 
 #include <xinu.h>
+/* performs the summation in parallel using locks */
 
-
-void slq_init(lock_tq *l)
+void init_lock(lock_t *l)
 {
     qid16 q;
     q = newqueue();
@@ -14,7 +14,7 @@ void slq_init(lock_tq *l)
     //queue_init(l->q);
 }
 
-void slq_lock(lock_tq *l)
+void lock(lock_t *l)
 {
 
     struct procent* prptr;
@@ -47,7 +47,7 @@ void slq_lock(lock_tq *l)
     }
 }
 
-void slq_unlock(lock_tq *l)
+void unlock(lock_t *l)
 {
     pid32 temp;
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning

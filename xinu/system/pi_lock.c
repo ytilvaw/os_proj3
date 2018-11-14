@@ -20,7 +20,7 @@ pri16 find_n_max(pid32 owner)
 }
 
 
-void pi_init(lock_tpi *l)
+void pi_init(pi_lock_t *l)
 {
     *(l->q) = newqueue();
 
@@ -38,7 +38,7 @@ void pi_init(lock_tpi *l)
 	lock_id++;
 }
 
-void pi_lock(lock_tpi *l)
+void pi_lock(pi_lock_t *l)
 {
 
     struct procent* prptr;
@@ -107,7 +107,7 @@ void pi_lock(lock_tpi *l)
     }
 }
 
-void pi_unlock(lock_tpi *l)
+void pi_unlock(pi_lock_t *l)
 {
     intmask mask;
     mask = disable();
