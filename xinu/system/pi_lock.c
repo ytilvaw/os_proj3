@@ -22,7 +22,8 @@ pri16 find_n_max(pid32 owner)
 
 void pi_init(pi_lock_t *l)
 {
-    *(l->q) = newqueue();
+    qid16 temp = newqueue();
+    (l->q) = temp;
 
     l->flag = 0;
     l->guard = 0;
@@ -32,6 +33,7 @@ void pi_init(pi_lock_t *l)
 	}
 	l->lid = lock_id;
     intmask mask;
+    if(debug){kprintf("queue id of lock %d returned is %d and assigned as %d\n", l->lid, temp, (l->q));}
     mask = disable();
 	if(debug){kprintf("lock %d is initialized by process %d\n", l->lid, currpid);}
 	restore(mask);
@@ -93,7 +95,9 @@ void pi_lock(pi_lock_t *l)
 			kprintf("ERROR: bad pid = %d detected in pi_lock\n", currpid);
 		}
 
-        enqueue(currpid, *(l->q));
+        insert( currpid, (l->q), proctab[currpid].prprio );
+		if(debug){kprintf("process %d has emtered sleep queue %d of lock %d\n", currpid, (l->q), l->lid);}
+        //enqueue(currpid, (l->q));
         prptr->park = TRUE;
         l->guard = 0;
         if( prptr->park == TRUE ) 
@@ -155,7 +159,7 @@ void pi_unlock(pi_lock_t *l)
 
 	/*------------------------ code for priority inversion ------------------------*/
 
-    if( isempty(*(l->q)) )
+    if( isempty((l->q)) )
     {
         l->flag = 0;
 		l_arr[l->lid].avail = TRUE;
@@ -166,10 +170,11 @@ void pi_unlock(pi_lock_t *l)
     }
     else
     {
-        temp = dequeue(*(l->q));
+        temp = dequeue((l->q));
 		l_arr[l->lid].owner_proc = temp;
         mask = disable();
         if(debug){kprintf("Process %d got the lock %d from %d \n", temp, l->lid, currpid);}
+		if(debug){kprintf("process %d has been removed from  sleep queue %d of lock %d\n", temp, (l->q), l->lid);}
 	    restore(mask);
         struct procent* prptr_temp;
         prptr_temp = &proctab[temp];

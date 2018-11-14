@@ -25,7 +25,7 @@ uint32 stop_2;
 typedef struct __lock_t {
     int flag;
     int guard;
-    queue_t* q;
+    queue_t q;
 } lock_t;
 
 
@@ -41,7 +41,7 @@ uint32 lock_id;
 typedef struct __al_lock_t {
     int 		flag;
     int 		guard;
-    queue_t* 	q;
+    queue_t 	q;
 	uint32		lid;
 } al_lock_t;
 
@@ -73,7 +73,7 @@ bool8 	al_trylock(al_lock_t *l);
 typedef struct __pi_lock_t {
     int 		flag;
     int 		guard;
-    queue_t* 	q;
+    queue_t 	q;
 	uint32		lid;
 } pi_lock_t;
 

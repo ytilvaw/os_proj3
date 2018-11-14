@@ -55,7 +55,7 @@ void search_owner_in_wait_col(bool8 *found, uint32 *temp_lid, pid32 owner)
 
 void al_init(al_lock_t *l)
 {
-    *(l->q) = newqueue();
+    (l->q) = newqueue();
 
     l->flag = 0;
     l->guard = 0;
@@ -81,6 +81,9 @@ bool8 al_trylock(al_lock_t *l)
 	{
         l->flag = 1;
         l->guard = 0;
+        l_arr[l->lid].owner_proc 	= currpid;
+		l_arr[l->lid].avail 		= FALSE;
+
 		return TRUE;
 	}
 }
@@ -178,7 +181,7 @@ void al_lock(al_lock_t *l)
 		//if(debug) { print_l_arr(); }
 		/* code for deadlock detection */
         prptr = &proctab[currpid];
-        enqueue(currpid, *(l->q));
+        enqueue(currpid, (l->q));
         prptr->park = TRUE;
         l->guard = 0;
         if( prptr->park == TRUE ) 
@@ -201,7 +204,7 @@ void al_unlock(al_lock_t *l)
     pid32 temp;
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
     
-    if( isempty(*(l->q)) )
+    if( isempty((l->q)) )
     {
         l->flag = 0;
 		l_arr[l->lid].avail = TRUE;
@@ -212,7 +215,7 @@ void al_unlock(al_lock_t *l)
     }
     else
     {
-        temp = dequeue(*(l->q));
+        temp = dequeue((l->q));
 		l_arr[l->lid].owner_proc = temp;
         mask = disable();
         //if(debug){printf("Process %d got the lock %d from %d \n", temp, l->lid, currpid);}

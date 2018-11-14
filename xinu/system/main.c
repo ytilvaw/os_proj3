@@ -45,8 +45,9 @@ process	main(void)
 
 	/*------------------------ p5 --------------------------*/
 
-	//compare_p2_p3();
-	compare_p3_p5();
+	compare_p2_p3();
+    //sleepms(5000);
+	//compare_p3_p5();
 	/*------------------------ Test cases --------------------------*/
 
 	return OK;

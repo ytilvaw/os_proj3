@@ -10,7 +10,7 @@ void init_lock(lock_t *l)
     //printf("qid = %d\n",q);
     l->flag = 0;
     l->guard = 0;
-    *(l->q) = q;
+    (l->q) = q;
     //queue_init(l->q);
 }
 
@@ -31,7 +31,7 @@ void lock(lock_t *l)
     else
     {
         //queue_add (l->q, currpid);
-        enqueue(currpid, *(l->q));
+        enqueue(currpid, (l->q));
         prptr = &proctab[currpid];
         prptr->park = TRUE;
         l->guard = 0;
@@ -52,7 +52,7 @@ void unlock(lock_t *l)
     pid32 temp;
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
     
-    if( isempty(*(l->q)) )
+    if( isempty((l->q)) )
     {
         l->flag = 0;
         //printf("process %d relased the lock \n", currpid);
@@ -60,7 +60,7 @@ void unlock(lock_t *l)
     else
     {
         //temp = queue_remove(l->q);
-        temp = dequeue(*(l->q));
+        temp = dequeue((l->q));
         //printf("Process %d got the lock from %d \n", temp, currpid);
         struct procent* prptr;
         prptr = &proctab[temp];

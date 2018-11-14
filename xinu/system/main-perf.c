@@ -20,7 +20,7 @@ void compare_p2_p3()
     sum_naive_arr = sync_parallel_summation_p2(array, n, num_threads);
 	uint32 time_1 = stop_1-start_1;
 
-	kprintf("time in p2->%d and sum->%d \n", time_1, sum_naive_arr);
+	kprintf("time in spin lock->%d and sum->%d \n", time_1, sum_naive_arr);
 
 	
 	/* getting the execution time for p3 */
@@ -28,6 +28,6 @@ void compare_p2_p3()
 	start_2 = ctr1000;
     sum_naive_arr = sync_parallel_summation(array, n, num_threads);
 	uint32 time_2 = stop_2-start_2;
-	kprintf("time in p3->%d and sum->%d \n", time_2, sum_naive_arr);
+	kprintf("time in sleep queue->%d and sum->%d \n", time_2, sum_naive_arr);
 
 }
