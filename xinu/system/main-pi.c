@@ -10,9 +10,9 @@ void printA_pi(pi_lock_t *l0)
 	intmask mask;
 	pi_lock(l0);
 	sleepms(1000);
-    mask = disable();
-	kprintf("This print is with lock l0 in printA_pi\n");
-	restore(mask);
+    //mask = disable();
+	//kprintf("This print is with lock l0 in printA_pi\n");
+	//restore(mask);
 	
 	pi_unlock(l0);
 }
@@ -22,9 +22,9 @@ void printB_pi(pi_lock_t *l0)
 	sleepms(500);
 	intmask mask;
 	pi_lock(l0);
-    mask = disable();
-	kprintf("This print is with lock l0 in printB_pi\n");
-	restore(mask);
+    //mask = disable();
+	//kprintf("This print is with lock l0 in printB_pi\n");
+	//restore(mask);
 	
 	pi_unlock(l0);
 }
@@ -152,3 +152,61 @@ void create_proc_for_pi_4p_3p()
 
 
 /*-----------------------------------------------------------------------------*/
+
+void run_p5(pi_lock_t *l0)
+{
+	sleepms(500);
+	intmask mask;
+	pi_lock(l0);
+    //mask = disable();
+	//kprintf("This print is with lock l0 in run_p5\n");
+	//restore(mask);
+	
+	pi_unlock(l0);
+	uint32 time_5 = (ctr1000 - start_5);
+	
+    //mask = disable();
+	kprintf("p5->%d\n", time_5);
+	//restore(mask);
+}
+
+
+void run_p3(lock_t *l0)
+{
+	sleepms(500);
+	intmask mask;
+	lock(l0);
+    //mask = disable();
+	//kprintf("This print is with lock l0 in run_p3\n");
+	//restore(mask);
+	
+	unlock(l0);
+	uint32 time_3 = (ctr1000 - start_3);
+	
+    mask = disable();
+	kprintf("p3->%d\n", time_3);
+	restore(mask);
+}
+
+
+void compare_p3_p5()
+{
+	pi_lock_t l0;
+
+	pi_init(&l0);
+
+	resume(create((void *)printA_pi, 4096,20, "func_printA_pi", 1, &l0) );
+	start_5 = ctr1000;
+	resume(create((void *)run_p5, 4096,40, "func_run_p5", 1, &l0) );
+
+	sleepms(1000);
+
+	lock_t l1;
+
+	init_lock(&l1);
+	resume(create((void *)printA_pi, 4096,20, "func_printA_pi", 1, &l1) );
+	start_3 = ctr1000;
+	resume(create((void *)run_p3, 4096,40, "func_run_p5", 1, &l1) );
+
+}
+

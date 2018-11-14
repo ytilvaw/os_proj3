@@ -18,6 +18,8 @@ void sl_unlock(sl_lock_t *l);
 typedef qid16 queue_t;
 
 uint32 start_2;
+uint32 start_3;
+uint32 start_5;
 uint32 stop_2;
 
 typedef struct __lock_t {
