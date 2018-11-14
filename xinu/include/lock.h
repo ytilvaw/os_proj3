@@ -45,6 +45,7 @@ struct l_arr_entry
 	bool8 	avail;
 	pid32 	owner_proc;
 	pid32	wait_proc;
+	pri16	n_prior;
 };
 
 struct l_arr_entry l_arr[T_LOCKS];
@@ -58,4 +59,20 @@ void 	al_unlock(lock_td *l);
 bool8 	al_trylock(lock_td *l);
 /*-------------------for p4----------------------------------*/
 
+
+
+/*-------------------for p5----------------------------------*/
+
+typedef struct __lock_tpi {
+    int 		flag;
+    int 		guard;
+    queue_t* 	q;
+	uint32		lid;
+} lock_tpi;
+
+pri16 	find_n_max(pid32 owner);
+void 	pi_init(lock_tpi *l);
+void 	pi_lock(lock_tpi *l);
+void 	pi_unlock(lock_tpi *l);
+/*-------------------for p5----------------------------------*/
 

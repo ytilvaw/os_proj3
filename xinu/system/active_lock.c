@@ -9,11 +9,11 @@ void print_l_arr()
 
 	
     mask = disable();
-	//if(debug){printf("lid\t\t available\t\t owner_process\t\t waiting_process\n");}
-	//if(debug){printf("---\t\t ---------\t\t -------------\t\t ---------------\n");}
+	kprintf("lid\t\t available\t\t owner_process\t\t waiting_process \t\t Next_prior\n");
+	kprintf("---\t\t ---------\t\t -------------\t\t --------------- \t\t ---------------\n");
 	for(int i=0; i<T_LOCKS; i++)
 	{
-		//if(debug){printf("%d\t\t %d\t\t\t %d\t\t\t %d\n", i, l_arr[i].avail, l_arr[i].owner_proc, l_arr[i].wait_proc);}
+		kprintf("%d\t\t %d\t\t\t %d\t\t\t %d\t\t\t %d\n", i, l_arr[i].avail, l_arr[i].owner_proc, l_arr[i].wait_proc, l_arr[i].n_prior);
 	}
 	restore(mask);
 
@@ -33,6 +33,7 @@ void l_arr_init()
 		l_arr[i].avail 			= TRUE;
 		l_arr[i].owner_proc 	= 500;
 		l_arr[i].wait_proc 		= 200;
+		l_arr[i].n_prior 		= 0;
 	}
 }
 
