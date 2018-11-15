@@ -38,6 +38,8 @@ process	main(void)
 	/*------------------------ p2 --------------------------*/
 
 	//create_proc_for_deadlock_5p_2d();
+    
+    //create_proc_for_deadlock_dr_2p_1d();
 	/*------------------------ p4 --------------------------*/
 	//create_proc_for_pi_2p();
 	//create_proc_for_pi_3p();
@@ -45,9 +47,9 @@ process	main(void)
 
 	/*------------------------ p5 --------------------------*/
 
-	compare_p2_p3();
+	//compare_p2_p3();
     //sleepms(5000);
-	//compare_p3_p5();
+	compare_p3_p5();
 	/*------------------------ Test cases --------------------------*/
 
 	return OK;

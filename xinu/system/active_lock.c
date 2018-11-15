@@ -1,7 +1,7 @@
 
 #include <xinu.h>
 
-//#define debug 0
+#define debug 0
 
 void print_l_arr()
 {
@@ -61,18 +61,20 @@ void al_init(al_lock_t *l)
     l->guard = 0;
 	if(lock_id>=T_LOCKS)
 	{
-		//if(debug){printf("ERROR: Invalid lock id = %d detected\n", lock_id);}
+		if(debug){kprintf("ERROR: Invalid lock id = %d detected\n", lock_id);}
 	}
 	l->lid = lock_id;
     intmask mask;
     mask = disable();
-		//if(debug){printf("lock %d is initialized by process %d\n", l->lid, currpid);}
+		if(debug){kprintf("lock %d is initialized by process %d\n", l->lid, currpid);}
 	restore(mask);
 	lock_id++;
 }
 
 bool8 al_trylock(al_lock_t *l)
 {
+    while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
+
 	if(l->flag == 1)
 	{
 		return FALSE;
@@ -83,7 +85,6 @@ bool8 al_trylock(al_lock_t *l)
         l->guard = 0;
         l_arr[l->lid].owner_proc 	= currpid;
 		l_arr[l->lid].avail 		= FALSE;
-
 		return TRUE;
 	}
 }
@@ -100,31 +101,31 @@ void al_lock(al_lock_t *l)
     {
         l->flag = 1;
         mask = disable();
-		//if(debug){printf("lock %d is aquired by process %d\n", l->lid, currpid);}
+		if(debug){kprintf("lock %d is aquired by process %d\n", l->lid, currpid);}
 	    restore(mask);
         l->guard = 0;
 		if(isbadpid(currpid))
 		{
-			//if(debug){printf("ERROR: bad pid = %d detected in al_lock\n", currpid);}
+			if(debug){kprintf("ERROR: bad pid = %d detected in al_lock\n", currpid);}
 		}
 		l_arr[l->lid].owner_proc 	= currpid;
 		l_arr[l->lid].avail 		= FALSE;
 
-		//if(debug) { print_l_arr(); }
+		if(debug) { print_l_arr(); }
 		
-        //if(debug){printf("process %d acquired the lock \n", currpid);}
+        if(debug){kprintf("process %d acquired the lock \n", currpid);}
     }
     else
     {
 		
         mask = disable();
-		//if(debug){printf("process %d is waiting for lock %d and will sleep now\n", currpid, l->lid);}
+		if(debug){kprintf("process %d is waiting for lock %d and will sleep now\n", currpid, l->lid);}
 	    restore(mask);
 
 		/* code for deadlock detection */
 		if(isbadpid(currpid))
 		{
-			//if(debug){printf("ERROR: bad pid = %d detected in al_lock\n", currpid);}
+			if(debug){kprintf("ERROR: bad pid = %d detected in al_lock\n", currpid);}
 		}
 
 		bool8 	found = FALSE;
@@ -136,7 +137,7 @@ void al_lock(al_lock_t *l)
 			owner_pid = l_arr[temp_lid].owner_proc;
 			search_owner_in_wait_col(&found, &temp_lid, owner_pid);
 			d_arr[owner_pid]= TRUE;
-			//if(debug){printf("Inside while and owner pid = %d\n", owner_pid);}
+			if(debug){kprintf("Inside while and owner pid = %d\n", owner_pid);}
 		}while(found);
 	
 		bool8 f_print = FALSE;	
@@ -144,23 +145,23 @@ void al_lock(al_lock_t *l)
 		{
 			d_arr[owner_pid]= TRUE;
             mask = disable();
-			printf("lock_detected=<");
+			kprintf("lock_detected=<");
 			for(int i=0;i<NPROC;i++)
 			{
 				if(d_arr[i] == TRUE)
 				{
 					if(!f_print)
 					{
-						printf("p%d", i);
+						kprintf("p%d", i);
 						f_print=TRUE;
 					}
 					else
 					{
-						printf("-p%d", i);
+						kprintf("-p%d", i);
 					}
 				}
 			}
-			printf(">\n");
+			kprintf(">\n");
 	        restore(mask);
 			// flushing deadlock array
 			for(int i =0;i<NPROC;i++)
@@ -178,7 +179,7 @@ void al_lock(al_lock_t *l)
 			}
 		}
 			
-		//if(debug) { print_l_arr(); }
+		if(debug) { print_l_arr(); }
 		/* code for deadlock detection */
         prptr = &proctab[currpid];
         enqueue(currpid, (l->q));
@@ -199,7 +200,7 @@ void al_unlock(al_lock_t *l)
 {
     intmask mask;
     mask = disable();
-    //if(debug){printf("Process %d is has called unlock on lock %d\n", currpid, l->lid);}
+    if(debug){kprintf("Process %d is has called unlock on lock %d\n", currpid, l->lid);}
 	restore(mask);
     pid32 temp;
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
@@ -210,7 +211,7 @@ void al_unlock(al_lock_t *l)
 		l_arr[l->lid].avail = TRUE;
 		l_arr[l->lid].owner_proc = 500;
         mask = disable();
-        //if(debug){printf("process %d relased the lock %d\n", currpid, l->lid);}
+        if(debug){kprintf("process %d relased the lock %d\n", currpid, l->lid);}
 	    restore(mask);
     }
     else
@@ -218,7 +219,7 @@ void al_unlock(al_lock_t *l)
         temp = dequeue((l->q));
 		l_arr[l->lid].owner_proc = temp;
         mask = disable();
-        //if(debug){printf("Process %d got the lock %d from %d \n", temp, l->lid, currpid);}
+        if(debug){kprintf("Process %d got the lock %d from %d \n", temp, l->lid, currpid);}
 	    restore(mask);
         struct procent* prptr;
         prptr = &proctab[temp];
