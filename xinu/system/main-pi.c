@@ -254,37 +254,6 @@ void run_p3(lock_t *l0)
 }
 
 
-void dummy_func1()
-{
-    uint32 num = 0;
-    for(uint32 i=0; i<10000000; i++)
-    {
-        num = num + i;
-    }
-
-    num = 0;
-    for(uint32 i=0; i<10000000; i++)
-    {
-        num = num + i;
-    }
-
-}
-
-void dummy_func2()
-{
-    uint32 num = 0;
-    for(uint32 i=0; i<10000000; i++)
-    {
-        num = num + i;
-    }
-
-    num = 0;
-    for(uint32 i=0; i<10000000; i++)
-    {
-        num = num + i;
-    }
-
-}
 
 void compare_p3_p5()
 {
@@ -315,4 +284,104 @@ void compare_p3_p5()
 
 
 }
+
+
+/*-----------------------------------------------------------------------------*/
+void transitive_p0(pi_lock_t *l0)
+{
+	intmask mask;
+	pi_lock(l0);
+
+    mask = disable();
+	//kprintf("This print is with lock l0 in transitive_p0\n");
+	restore(mask);
+	
+	sleepms(2000);
+		
+	pi_unlock(l0);
+}
+
+
+void transitive_p1(pi_lock_t *l1, pi_lock_t *l0)
+{
+
+	intmask mask;
+	sleepms(100);
+	pi_lock(l1);
+    mask = disable();
+	//kprintf("This print is with lock l1 in transitive_p1\n");
+	restore(mask);
+	
+	sleepms(1000);
+
+	pi_lock(l0);
+	//sleepms(100);
+    mask = disable();
+	//kprintf("This print is with lock l0 in transitive_p1\n");
+	restore(mask);
+
+	pi_unlock(l1);
+	pi_unlock(l0);
+	//sleepms(200);
+
+}
+
+void transitive_p2(pi_lock_t *l2, pi_lock_t *l1)
+{
+
+	intmask mask;
+	sleepms(200);
+	pi_lock(l2);
+    mask = disable();
+	//kprintf("This print is with lock l2 in transitive_p2\n");
+	restore(mask);
+	
+	sleepms(1000);
+
+	pi_lock(l1);
+	//sleepms(100);
+    mask = disable();
+	//kprintf("This print is with lock l1 in transitive_p2\n");
+	restore(mask);
+
+	pi_unlock(l2);
+	pi_unlock(l1);
+	//sleepms(100);
+
+}
+
+void transitive_p3(pi_lock_t *l2)
+{
+	intmask mask;
+	sleepms(300);
+	pi_lock(l2);
+
+	//sleepms(100);
+    mask = disable();
+	//kprintf("This print is with lock l2 in transitive_p3\n");
+	restore(mask);
+	
+	pi_unlock(l2);
+}
+
+void create_proc_for_transitive()
+{
+	pi_lock_t l0;
+	pi_lock_t l1;
+	pi_lock_t l2;
+
+	pi_init(&l0);
+	pi_init(&l1);
+	pi_init(&l2);
+
+
+	resume(create((void *)transitive_p0, 4096, 5, "func_transitive_p0", 1, &l0) );
+	resume(create((void *)transitive_p1, 4096,10, "func_transitive_p1", 2, &l1, &l0) );
+	resume(create((void *)transitive_p2, 4096,20, "func_transitive_p1", 2, &l2, &l1) );
+	resume(create((void *)transitive_p3, 4096,30, "func_transitive_p3", 1, &l2) );
+
+}
+
+
+/*-----------------------------------------------------------------------------*/
 

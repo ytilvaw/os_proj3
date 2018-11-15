@@ -33,8 +33,8 @@ void pi_init(pi_lock_t *l)
 	}
 	l->lid = lock_id;
     intmask mask;
-    if(debug){kprintf("queue id of lock %d returned is %d and assigned as %d\n", l->lid, temp, (l->q));}
     mask = disable();
+    if(debug){kprintf("queue id of lock %d returned is %d and assigned as %d\n", l->lid, temp, (l->q));}
 	if(debug){kprintf("lock %d is initialized by process %d\n", l->lid, currpid);}
 	restore(mask);
 	lock_id++;
@@ -47,6 +47,9 @@ void pi_lock(pi_lock_t *l)
     intmask mask;
 
     while(testandset( &l->guard, 1 ) == 1 );    //acquire the guard lock by spinning
+	mask = disable();
+    if(debug){kprintf("Process %d has aquired the guard in lock\n", currpid);}
+	restore(mask);
 
     if(l->flag == 0)
     {
@@ -55,6 +58,11 @@ void pi_lock(pi_lock_t *l)
 		if(debug){kprintf("lock %d is aquired by process %d\n", l->lid, currpid);}
 	    restore(mask);
         l->guard = 0;
+
+    	mask = disable();
+    	if(debug){kprintf("process %d relased the guard in lock if %d\n", currpid);}
+		restore(mask);
+
 		if(isbadpid(currpid))
 		{
 			if(debug){kprintf("ERROR: bad pid = %d detected in pi_lock\n", currpid);}
@@ -71,17 +79,31 @@ void pi_lock(pi_lock_t *l)
 		/*------------------------ code for priority inversion ------------------------*/
 	
         mask = disable();
-		if(debug){kprintf("lid:%d \tl_arr[l->lid].owner_proc:%d\t proctab[l_arr[l->lid].owner_proc].prprio:%d\t proctab[l_arr[l->lid].owner_proc].o_prprio:%d\t prptr->prprio:%d \tl_arr[l->lid].n_prior:%d\n", l->lid, l_arr[l->lid].owner_proc, proctab[l_arr[l->lid].owner_proc].prprio, proctab[l_arr[l->lid].owner_proc].o_prprio, prptr->prprio, l_arr[l->lid].n_prior);}
+		if(debug){kprintf("currpid:%d\tlid:%d \tl_arr[l->lid].owner_proc:%d\t proctab[l_arr[l->lid].owner_proc].prprio:%d\t proctab[l_arr[l->lid].owner_proc].o_prprio:%d\t prptr->prprio:%d \tl_arr[l->lid].n_prior:%d\n", currpid, l->lid, l_arr[l->lid].owner_proc, proctab[l_arr[l->lid].owner_proc].prprio, proctab[l_arr[l->lid].owner_proc].o_prprio, prptr->prprio, l_arr[l->lid].n_prior);}
 	    restore(mask);
 
 		if((proctab[l_arr[l->lid].owner_proc].prprio < prptr->prprio) && (proctab[l_arr[l->lid].owner_proc].o_prprio < prptr->prprio) && (l_arr[l->lid].n_prior < prptr->prprio))
 		{
 			l_arr[l->lid].n_prior = prptr->prprio;
-			pri16 old_prio = proctab[l_arr[l->lid].owner_proc].prprio;
-			proctab[l_arr[l->lid].owner_proc].prprio = prptr->prprio;
-            mask = disable();
-			kprintf("priority_change=P%d::%d-%d\n",l_arr[l->lid].owner_proc, old_prio, proctab[l_arr[l->lid].owner_proc].prprio);
-	        restore(mask);
+			uint32 curr_lid = l->lid;
+			do
+			{
+				pri16 old_prio = proctab[l_arr[curr_lid].owner_proc].prprio;
+				proctab[l_arr[curr_lid].owner_proc].prprio = prptr->prprio;
+            	mask = disable();
+				kprintf("priority_change=P%d::%d-%d\n",l_arr[curr_lid].owner_proc, old_prio, proctab[l_arr[curr_lid].owner_proc].prprio);
+	        	restore(mask);
+
+				if(proctab[l_arr[curr_lid].owner_proc].prstate == PR_WAIT)
+				{
+					curr_lid = proctab[l_arr[curr_lid].owner_proc].wait_lock; 
+				}
+				else
+				{
+					curr_lid = 200;
+				}
+				
+			}while(curr_lid != 200);
 		}
 		if(debug) { print_l_arr(); }
 		/*------------------------ code for priority inversion ------------------------*/
@@ -96,13 +118,21 @@ void pi_lock(pi_lock_t *l)
 		}
 
         insert( currpid, (l->q), proctab[currpid].prprio );
+        mask = disable();
 		if(debug){kprintf("process %d has emtered sleep queue %d of lock %d\n", currpid, (l->q), l->lid);}
+	    restore(mask);
         //enqueue(currpid, (l->q));
         prptr->park = TRUE;
         l->guard = 0;
+
+    	mask = disable();
+    	if(debug){kprintf("process %d relased the guard in lock else %d\n", currpid);}
+		restore(mask);
+
         if( prptr->park == TRUE ) 
         {
             prptr->prstate = PR_WAIT;
+            prptr->wait_lock = l->lid;
             mask = disable();
 	        resched();
 	        restore(mask);
@@ -126,6 +156,10 @@ void pi_unlock(pi_lock_t *l)
     prptr = &proctab[currpid];
 	l_arr[l->lid].n_prior = 0;
 		
+	mask = disable();
+    if(debug){kprintf("Process %d has aquired the guard in unlock\n", currpid);}
+	restore(mask);
+
 
 	if(prptr->prprio < prptr->o_prprio)
 	{
@@ -135,7 +169,10 @@ void pi_unlock(pi_lock_t *l)
 	if(prptr->prprio > prptr->o_prprio)
 	{
 		pri16 max_n_prior = find_n_max(l_arr[l->lid].owner_proc);
+        mask = disable();
 		if(debug==1){kprintf("max_n_prior is %d and prptr->o_prprio is %d\n", max_n_prior, prptr->o_prprio);}
+	    restore(mask);
+		
 		if(max_n_prior > prptr->o_prprio)
 		{
 			pri16 old_prio = prptr->prprio;
@@ -172,6 +209,7 @@ void pi_unlock(pi_lock_t *l)
     {
         temp = dequeue((l->q));
 		l_arr[l->lid].owner_proc = temp;
+		proctab[temp].wait_lock = 200;
         mask = disable();
         if(debug){kprintf("Process %d got the lock %d from %d \n", temp, l->lid, currpid);}
 		if(debug){kprintf("process %d has been removed from  sleep queue %d of lock %d\n", temp, (l->q), l->lid);}
@@ -184,4 +222,7 @@ void pi_unlock(pi_lock_t *l)
     
     l->guard = 0;
 
+    mask = disable();
+    if(debug){kprintf("process %d relased the guard in unlock %d\n", currpid);}
+	restore(mask);
 }

@@ -180,7 +180,9 @@ static	void	sysinit()
 		prptr->prname[0] = NULLCH;
 		prptr->prstkbase = NULL;
 		prptr->prprio = 0;
+		prptr->o_prprio = 0;
         prptr->park = FALSE;
+        prptr->wait_lock = 200;
 	}
 
 	/* Initialize the Null process entry */	

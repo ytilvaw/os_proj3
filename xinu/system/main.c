@@ -49,7 +49,9 @@ process	main(void)
 
 	//compare_p2_p3();
     //sleepms(5000);
-	compare_p3_p5();
+	//compare_p3_p5();
+
+	create_proc_for_transitive();
 	/*------------------------ Test cases --------------------------*/
 
 	return OK;
