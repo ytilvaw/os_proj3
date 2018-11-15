@@ -194,15 +194,8 @@ void create_proc_for_pi_4p_3p()
 	pi_lock_t l2;
 
 	pi_init(&l0);
-    kprintf("lock l0 in main has the lock id %d and its sleep queue id is %d and its address is %d\n", l0.lid, (l0.q), &(l0.q) );
 	pi_init(&l1);
-    kprintf("lock l1 in main has the lock id %d and its sleep queue id is %d and its address is %d\n", l1.lid, (l1.q), &(l1.q) );
 	pi_init(&l2);
-    kprintf("lock l2 in main has the lock id %d and its sleep queue id is %d and its address is %d\n", l2.lid, (l2.q), &(l2.q) );
-
-    kprintf("lock l0 in main has the lock id %d and its sleep queue id is %d and its address is %d\n", l0.lid, (l0.q), &(l0.q) );
-    kprintf("lock l1 in main has the lock id %d and its sleep queue id is %d and its address is %d\n", l1.lid, (l1.q), &(l1.q) );
-    kprintf("lock l2 in main has the lock id %d and its sleep queue id is %d and its address is %d\n", l2.lid, (l2.q), &(l2.q) );
 
 	resume(create((void *)print_p1_pi_4p, 4096,10, "func_print_p1_pi_4p", 3, &l0, &l1, &l2) );
 	resume(create((void *)print_p2_pi_4p, 4096,20, "func_print_p2_pi_4p", 1, &l0) );
@@ -315,14 +308,14 @@ void transitive_p1(pi_lock_t *l1, pi_lock_t *l0)
 	sleepms(1000);
 
 	pi_lock(l0);
-	//sleepms(100);
+	sleepms(100);
     mask = disable();
 	//kprintf("This print is with lock l0 in transitive_p1\n");
 	restore(mask);
 
-	pi_unlock(l1);
 	pi_unlock(l0);
-	//sleepms(200);
+	sleepms(200);
+	pi_unlock(l1);
 
 }
 
@@ -339,14 +332,14 @@ void transitive_p2(pi_lock_t *l2, pi_lock_t *l1)
 	sleepms(1000);
 
 	pi_lock(l1);
-	//sleepms(100);
+	sleepms(100);
     mask = disable();
 	//kprintf("This print is with lock l1 in transitive_p2\n");
 	restore(mask);
 
-	pi_unlock(l2);
 	pi_unlock(l1);
-	//sleepms(100);
+	sleepms(100);
+	pi_unlock(l2);
 
 }
 
@@ -356,7 +349,7 @@ void transitive_p3(pi_lock_t *l2)
 	sleepms(300);
 	pi_lock(l2);
 
-	//sleepms(100);
+	sleepms(100);
     mask = disable();
 	//kprintf("This print is with lock l2 in transitive_p3\n");
 	restore(mask);

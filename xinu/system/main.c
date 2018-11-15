@@ -36,7 +36,7 @@ process	main(void)
     //sum_naive_arr = sync_parallel_summation(array, n, num_threads);
 	//kprintf("Sum of array sync parallel with lock -> %d\n", sum_naive_arr);
 	/*------------------------ p2 --------------------------*/
-
+	create_proc_for_deadlock_4p_1d();
 	//create_proc_for_deadlock_5p_2d();
     
     //create_proc_for_deadlock_dr_2p_1d();
@@ -51,7 +51,7 @@ process	main(void)
     //sleepms(5000);
 	//compare_p3_p5();
 
-	create_proc_for_transitive();
+	//create_proc_for_transitive();
 	/*------------------------ Test cases --------------------------*/
 
 	return OK;
